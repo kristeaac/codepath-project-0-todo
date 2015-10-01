@@ -11,16 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
+import com.codepath.simpletodo.data.DatabaseHelper;
+import com.codepath.simpletodo.data.TodoItem;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
 
 public class MainActivity extends Activity {
     private static final int REQUEST_CODE = 20;
-    private ArrayList<String> items;
+    private ArrayList<String> itemText;
+    private ArrayList<TodoItem> items;
     private ArrayAdapter<String> itemsAdapter;
     ListView listViewItems;
 
@@ -30,7 +29,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         listViewItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, items);
+        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, itemText);
         listViewItems.setAdapter(itemsAdapter);
         setupListViewLongClickListener();
         setupListViewItemClickListener();
@@ -40,9 +39,9 @@ public class MainActivity extends Activity {
         listViewItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                items.remove(position);
+                itemText.remove(position);
                 itemsAdapter.notifyDataSetChanged();
-                writeItems();
+                deleteItem(items.get(position));
                 return true;
             }
         });
@@ -63,40 +62,36 @@ public class MainActivity extends Activity {
     }
 
     private void readItems() {
-        File filesDirectory = getFilesDir();
-        File todoFile = new File(filesDirectory, "todo.txt");
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<String>();
+        DatabaseHelper helper = DatabaseHelper.getHelper(getApplicationContext());
+        Iterable<TodoItem> itr = helper.readAll(TodoItem.class);
+        itemText = new ArrayList<String>();
+        items = new ArrayList<TodoItem>();
+        for (TodoItem todoItem : itr) {
+            itemText.add(todoItem.getValue());
+            items.add(todoItem);
         }
     }
 
+    private void deleteItem(TodoItem todoItem) {
+        DatabaseHelper helper = DatabaseHelper.getHelper(getApplicationContext());
+        helper.delete(todoItem);
+    }
+
     private void writeItems() {
-        File filesDirectory = getFilesDir();
-        File todoFile = new File(filesDirectory, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DatabaseHelper helper = DatabaseHelper.getHelper(getApplicationContext());
+        helper.write(items);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -107,7 +102,9 @@ public class MainActivity extends Activity {
     public void onAddItem(View view) {
         EditText editText = (EditText) findViewById(R.id.edNewItem);
         String itemText = editText.getText().toString();
+        TodoItem item = new TodoItem(itemText);
         itemsAdapter.add(itemText);
+        items.add(item);
         writeItems();
         editText.setText("");
     }
@@ -122,7 +119,8 @@ public class MainActivity extends Activity {
     }
 
     private void updateItem(int position, String text) {
-        items.set(position, text);
+        items.get(position).setValue(text);
+        itemText.set(position, text);
         itemsAdapter.notifyDataSetChanged();
         writeItems();
     }

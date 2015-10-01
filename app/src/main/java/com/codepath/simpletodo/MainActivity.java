@@ -13,14 +13,18 @@ import android.widget.ListView;
 
 import com.codepath.simpletodo.data.DatabaseHelper;
 import com.codepath.simpletodo.data.TodoItem;
+import com.codepath.simpletodo.data.TodoItemAdapter;
+import com.google.common.base.Optional;
+
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
     private static final int REQUEST_CODE = 20;
-    private ArrayList<String> itemText;
-    private ArrayList<TodoItem> items;
-    private ArrayAdapter<String> itemsAdapter;
+    private List<TodoItem> items;
+    private TodoItemAdapter itemsAdapter;
     ListView listViewItems;
 
     @Override
@@ -29,7 +33,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         listViewItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, itemText);
+        itemsAdapter = new TodoItemAdapter(getApplicationContext(), items);
         listViewItems.setAdapter(itemsAdapter);
         setupListViewLongClickListener();
         setupListViewItemClickListener();
@@ -39,7 +43,7 @@ public class MainActivity extends Activity {
         listViewItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                itemText.remove(position);
+                items.remove(position);
                 itemsAdapter.notifyDataSetChanged();
                 deleteItem(items.get(position));
                 return true;
@@ -53,8 +57,10 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), EditItemActivity.class);
-                String itemAtPosition = listViewItems.getItemAtPosition(position).toString();
-                intent.putExtra(EditItemActivity.EDIT_TEXT_KEY, itemAtPosition);
+                TodoItem itemAtPosition = (TodoItem) listViewItems.getItemAtPosition(position);
+                intent.putExtra(EditItemActivity.EDIT_TEXT_KEY, itemAtPosition.getValue());
+                Optional<DateTime> dueDate = itemAtPosition.getDueDate();
+                intent.putExtra(EditItemActivity.DUE_DATE_KEY, dueDate.isPresent() ? dueDate.get().getMillis() : null);
                 intent.putExtra(EditItemActivity.ITEM_INDEX_KEY, position);
                 startActivityForResult(intent, REQUEST_CODE);
             }
@@ -64,10 +70,8 @@ public class MainActivity extends Activity {
     private void readItems() {
         DatabaseHelper helper = DatabaseHelper.getHelper(getApplicationContext());
         Iterable<TodoItem> itr = helper.readAll(TodoItem.class);
-        itemText = new ArrayList<String>();
         items = new ArrayList<TodoItem>();
         for (TodoItem todoItem : itr) {
-            itemText.add(todoItem.getValue());
             items.add(todoItem);
         }
     }
@@ -103,8 +107,8 @@ public class MainActivity extends Activity {
         EditText editText = (EditText) findViewById(R.id.edNewItem);
         String itemText = editText.getText().toString();
         TodoItem item = new TodoItem(itemText);
-        itemsAdapter.add(itemText);
         items.add(item);
+        itemsAdapter.notifyDataSetChanged();
         writeItems();
         editText.setText("");
     }
@@ -114,13 +118,15 @@ public class MainActivity extends Activity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String editText = data.getExtras().getString(EditItemActivity.EDIT_TEXT_KEY);
             int itemPosition = data.getExtras().getInt(EditItemActivity.ITEM_INDEX_KEY);
-            updateItem(itemPosition, editText);
+            DateTime dueDate = new DateTime(data.getExtras().getLong(EditItemActivity.DUE_DATE_KEY));
+            updateItem(itemPosition, editText, dueDate);
         }
     }
 
-    private void updateItem(int position, String text) {
-        items.get(position).setValue(text);
-        itemText.set(position, text);
+    private void updateItem(int position, String text, DateTime dueDate) {
+        TodoItem item = items.get(position);
+        item.setValue(text);
+        item.setDueDate(dueDate);
         itemsAdapter.notifyDataSetChanged();
         writeItems();
     }

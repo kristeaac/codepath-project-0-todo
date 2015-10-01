@@ -51,6 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public synchronized static DatabaseHelper getHelper(Context context) {
         if (helper == null) {
+            //context.deleteDatabase(DATABASE_NAME);
             helper = new DatabaseHelper(context);
         }
         return helper;

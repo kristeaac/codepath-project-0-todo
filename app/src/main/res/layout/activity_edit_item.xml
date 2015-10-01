@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Edit Item Below:"
+        android:text="Task Name"
         android:id="@+id/editItemTitle"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -23,17 +23,55 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/editText"
-        android:layout_below="@+id/editItemTitle"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/editItemTitle"
+        android:layout_toEndOf="@+id/editItemTitle"
+        android:layout_marginLeft="23dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Due Date"
+        android:id="@+id/dueDateTitle"
+        android:layout_below="@+id/editText"
         android:layout_alignParentStart="true" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/saveEditButton"
         android:onClick="onEditItem"
-        android:layout_below="@+id/editText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:gravity="center"
+        android:layout_toStartOf="@+id/editText"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Space
+        android:layout_width="20px"
+        android:layout_height="20px"
+        android:layout_alignStart="@+id/datePicker"
+        android:id="@+id/space"
+        android:layout_below="@+id/dueDateTitle"
+        android:layout_alignEnd="@+id/editText" />
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/datePicker"
+        android:calendarViewShown="false"
+        android:layout_below="@+id/space"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp" />
+
+    <TimePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dueDateTime"
+        android:layout_below="@+id/datePicker"
+        android:layout_alignStart="@+id/datePicker" />
+
 </RelativeLayout>

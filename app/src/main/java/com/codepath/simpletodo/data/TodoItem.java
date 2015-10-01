@@ -12,18 +12,21 @@ public class TodoItem {
     private String value;
     @Column("dueDateMillis")
     private Long dueDateMillis;
+    @Column("priority")
+    private String priority;
 
     public TodoItem() {
-        this(null, null);
+        this(null, null, null);
     }
 
     public TodoItem(String value) {
-        this(value, null);
+        this(value, null, null);
     }
 
-    public TodoItem(String value, DateTime dueDate) {
+    public TodoItem(String value, DateTime dueDate, Priority priority) {
         this.value = value;
         this.dueDateMillis = dueDate == null ? null : dueDate.getMillis();
+        this.priority = priority == null ? null : priority.name();
     }
 
     public String getValue() {
@@ -44,5 +47,21 @@ public class TodoItem {
 
     public void setDueDate(DateTime dueDate) {
         this.dueDateMillis = dueDate == null ? null : dueDate.getMillis();
+    }
+
+    public Optional<Priority> getPriority() {
+        if (priority == null) {
+            return Optional.absent();
+        } else {
+            return Optional.of(Priority.valueOf(priority));
+        }
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority.name();
+    }
+
+    public static enum Priority {
+        HIGH, MEDIUM, LOW;
     }
 }

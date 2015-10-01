@@ -68,6 +68,10 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
         Bundle bundle = new Bundle();
         bundle.putString(EditTodoItemDialogFragment.EDIT_TEXT_KEY, itemAtPosition.getValue());
         bundle.putInt(EditTodoItemDialogFragment.ITEM_INDEX_KEY, position);
+        if (itemAtPosition.getPriority().isPresent()) {
+            String priorityString = itemAtPosition.getPriority().get().name();
+            bundle.putString(EditTodoItemDialogFragment.PRIORITY_KEY, priorityString);
+        }
         Optional<DateTime> dueDate = itemAtPosition.getDueDate();
         if (dueDate.isPresent()) {
             bundle.putLong(EditTodoItemDialogFragment.DUE_DATE_KEY, dueDate.get().getMillis());
@@ -124,14 +128,15 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
     }
 
     @Override
-    public void onFinishEditDialog(String value, int itemPosition, DateTime dueDate) {
-        updateItem(itemPosition, value, dueDate);
+    public void onFinishEditDialog(String value, int itemPosition, DateTime dueDate, TodoItem.Priority priority) {
+        updateItem(itemPosition, value, dueDate, priority);
     }
 
-    private void updateItem(int position, String text, DateTime dueDate) {
+    private void updateItem(int position, String text, DateTime dueDate, TodoItem.Priority priority) {
         TodoItem item = items.get(position);
         item.setValue(text);
         item.setDueDate(dueDate);
+        item.setPriority(priority);
         itemsAdapter.notifyDataSetChanged();
         writeItems();
     }

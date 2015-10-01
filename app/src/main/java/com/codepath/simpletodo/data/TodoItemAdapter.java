@@ -1,6 +1,7 @@
 package com.codepath.simpletodo.data;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,27 @@ public class TodoItemAdapter extends ArrayAdapter<TodoItem> {
             DateTime dueDate = dueDateOptional.get();
             TextView dueDateText = (TextView) view.findViewById(R.id.todoItemDueDate);
             dueDateText.setText(FORMATTER.print(dueDate));
+        }
+
+        Optional<TodoItem.Priority> priorityOptional = item.getPriority();
+        if (priorityOptional.isPresent()) {
+            TodoItem.Priority priority = priorityOptional.get();
+            TextView priorityText = (TextView) view.findViewById(R.id.itemPriority);
+            int color = Color.WHITE;
+            switch (priority) {
+                case HIGH:
+                    color = Color.RED;
+                    break;
+                case MEDIUM:
+                    color = Color.YELLOW;
+                    break;
+                default:
+                    color = Color.GREEN;
+                    break;
+            }
+            priorityText.setTextColor(color);
+            priorityText.setText(priority.name());
+
         }
 
         return view;

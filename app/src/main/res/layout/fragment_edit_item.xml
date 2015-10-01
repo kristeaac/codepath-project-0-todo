@@ -49,9 +49,10 @@
             android:text="Save"
             android:id="@+id/saveEditButton"
             android:gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_toStartOf="@+id/editText"
-            android:layout_below="@+id/dueDateTime" />
+            android:layout_below="@+id/itemPrioritySpinner"
+            android:layout_alignEnd="@+id/itemPrioritySpinner" />
 
         <Space
             android:layout_width="20px"
@@ -76,6 +77,23 @@
             android:id="@+id/dueDateTime"
             android:layout_below="@+id/datePicker"
             android:layout_alignStart="@+id/datePicker" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Priority"
+            android:id="@+id/itemPriorityTitle"
+            android:layout_below="@+id/dueDateTime"
+            android:layout_alignParentStart="true" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemPrioritySpinner"
+            android:layout_below="@+id/itemPriorityTitle"
+            android:layout_alignParentStart="true"
+            android:spinnerMode="dropdown" />
 
     </RelativeLayout>
 </ScrollView>

@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TimePicker;
+
+import com.codepath.simpletodo.data.TodoItem;
 
 import org.joda.time.DateTime;
 
@@ -18,6 +22,7 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     public static final String EDIT_TEXT_KEY = "editText";
     public static final String ITEM_INDEX_KEY = "itemIndex";
     public static final String DUE_DATE_KEY = "dueDate";
+    public static final String PRIORITY_KEY = "priority";
     private int itemPosition;
     private DateTime dueDate;
     private View fragmentView;
@@ -28,7 +33,7 @@ public class EditTodoItemDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
-        fragmentView = layoutInflater.inflate(R.layout.activity_edit_item, viewGroup);
+        fragmentView = layoutInflater.inflate(R.layout.fragment_edit_item, viewGroup);
         return fragmentView;
     }
 
@@ -58,14 +63,27 @@ public class EditTodoItemDialogFragment extends DialogFragment {
                 onEditItem(fragmentView);
             }
         });
+
+        Spinner spinner = (Spinner) view.findViewById(R.id.itemPrioritySpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.item_priorities, R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        String priorityString = getArguments().getString(PRIORITY_KEY);
+        if (priorityString != null) {
+            TodoItem.Priority priority = TodoItem.Priority.valueOf(priorityString);
+            spinner.setSelection(priority.ordinal());
+        }
     }
 
     public void onEditItem(View view) {
         EditText etName = (EditText) view.findViewById(R.id.editText);
         String value = etName.getText().toString();
         dueDate = getDueDate(view);
+        Spinner spinner = (Spinner) view.findViewById(R.id.itemPrioritySpinner);
+        TodoItem.Priority priority = TodoItem.Priority.valueOf((String) spinner.getSelectedItem());
         EditTodoItemDialogListener activity = (EditTodoItemDialogListener) getActivity();
-        activity.onFinishEditDialog(value, itemPosition, dueDate);
+        activity.onFinishEditDialog(value, itemPosition, dueDate, priority);
         this.dismiss();
     }
 
@@ -77,7 +95,7 @@ public class EditTodoItemDialogFragment extends DialogFragment {
 
     public interface EditTodoItemDialogListener {
 
-        void onFinishEditDialog(String value, int itemPosition, DateTime dueDate);
+        void onFinishEditDialog(String value, int itemPosition, DateTime dueDate, TodoItem.Priority priority);
 
     }
 

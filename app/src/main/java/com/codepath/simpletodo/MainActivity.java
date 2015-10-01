@@ -2,7 +2,6 @@ package com.codepath.simpletodo;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,21 +55,26 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TodoItem itemAtPosition = (TodoItem) listViewItems.getItemAtPosition(position);
 
-                FragmentManager fm = getFragmentManager();
-                Bundle bundle = new Bundle();
-                bundle.putString(EditItemActivity.EDIT_TEXT_KEY, itemAtPosition.getValue());
-                bundle.putInt(EditItemActivity.ITEM_INDEX_KEY, position);
-                Optional<DateTime> dueDate = itemAtPosition.getDueDate();
-                if (dueDate.isPresent()) {
-                    bundle.putLong(EditItemActivity.DUE_DATE_KEY, dueDate.get().getMillis());
-                }
-                EditTodoItemDialogFragment editNameDialog = (EditTodoItemDialogFragment) EditTodoItemDialogFragment.instantiate(getApplicationContext(), "com.codepath.simpletodo.EditTodoItemDialogFragment", bundle);
-                editNameDialog.setTargetFragment(editNameDialog, REQUEST_CODE);
-                editNameDialog.show(fm, "fragment_edit_name");
+                showEditDialogFragment(position);
             }
         });
+    }
+
+    private void showEditDialogFragment(int position) {
+        TodoItem itemAtPosition = (TodoItem) listViewItems.getItemAtPosition(position);
+
+        FragmentManager fm = getFragmentManager();
+        Bundle bundle = new Bundle();
+        bundle.putString(EditTodoItemDialogFragment.EDIT_TEXT_KEY, itemAtPosition.getValue());
+        bundle.putInt(EditTodoItemDialogFragment.ITEM_INDEX_KEY, position);
+        Optional<DateTime> dueDate = itemAtPosition.getDueDate();
+        if (dueDate.isPresent()) {
+            bundle.putLong(EditTodoItemDialogFragment.DUE_DATE_KEY, dueDate.get().getMillis());
+        }
+        EditTodoItemDialogFragment editNameDialog = (EditTodoItemDialogFragment) EditTodoItemDialogFragment.instantiate(getApplicationContext(), "com.codepath.simpletodo.EditTodoItemDialogFragment", bundle);
+        editNameDialog.setTargetFragment(editNameDialog, REQUEST_CODE);
+        editNameDialog.show(fm, "fragment_edit_name");
     }
 
     private void readItems() {
@@ -120,13 +124,8 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            String editText = data.getExtras().getString(EditItemActivity.EDIT_TEXT_KEY);
-            int itemPosition = data.getExtras().getInt(EditItemActivity.ITEM_INDEX_KEY);
-            DateTime dueDate = new DateTime(data.getExtras().getLong(EditItemActivity.DUE_DATE_KEY));
-            updateItem(itemPosition, editText, dueDate);
-        }
+    public void onFinishEditDialog(String value, int itemPosition, DateTime dueDate) {
+        updateItem(itemPosition, value, dueDate);
     }
 
     private void updateItem(int position, String text, DateTime dueDate) {
@@ -135,10 +134,5 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
         item.setDueDate(dueDate);
         itemsAdapter.notifyDataSetChanged();
         writeItems();
-    }
-
-    @Override
-    public void onFinishEditDialog(String value, int itemPosition, DateTime dueDate) {
-        updateItem(itemPosition, value, dueDate);
     }
 }

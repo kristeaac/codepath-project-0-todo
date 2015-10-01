@@ -1,7 +1,6 @@
 package com.codepath.simpletodo;
 
 import android.app.DialogFragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,9 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 
 public class EditTodoItemDialogFragment extends DialogFragment {
+    public static final String EDIT_TEXT_KEY = "editText";
+    public static final String ITEM_INDEX_KEY = "itemIndex";
+    public static final String DUE_DATE_KEY = "dueDate";
     private int itemPosition;
     private DateTime dueDate;
     private View fragmentView;
@@ -33,12 +35,12 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String editTextValue = getArguments().getString(EditItemActivity.EDIT_TEXT_KEY);
-        itemPosition = getArguments().getInt(EditItemActivity.ITEM_INDEX_KEY);
+        String editTextValue = getArguments().getString(EDIT_TEXT_KEY);
+        itemPosition = getArguments().getInt(ITEM_INDEX_KEY);
         EditText editText = (EditText) view.findViewById(R.id.editText);
         editText.setText(editTextValue);
 
-        Long dueDateMillis = getArguments().getLong(EditItemActivity.DUE_DATE_KEY);
+        Long dueDateMillis = getArguments().getLong(DUE_DATE_KEY);
         dueDate = dueDateMillis == null || dueDateMillis == 0 ? null : new DateTime(dueDateMillis);
         if (dueDate != null) {
             DatePicker datePicker = (DatePicker) view.findViewById(R.id.datePicker);

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.codepath.simpletodo.data.DatabaseHelper;
 import com.codepath.simpletodo.data.TodoItem;
@@ -34,17 +35,27 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
         readItems();
         itemsAdapter = new TodoItemAdapter(getApplicationContext(), items);
         listViewItems.setAdapter(itemsAdapter);
+        setupAddButtonOnClickListener();
         setupListViewLongClickListener();
         setupListViewItemClickListener();
+    }
+
+    private void setupAddButtonOnClickListener() {
+        TextView addButton = (TextView) findViewById(R.id.btnAddItem);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddItem(v);
+            }
+        });
+
     }
 
     private void setupListViewLongClickListener() {
         listViewItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                items.remove(position);
-                itemsAdapter.notifyDataSetChanged();
-                deleteItem(items.get(position));
+                deleteItem(position);
                 return true;
             }
         });
@@ -90,7 +101,9 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
         }
     }
 
-    private void deleteItem(TodoItem todoItem) {
+    private void deleteItem(int position) {
+        TodoItem todoItem = items.remove(position);
+        itemsAdapter.notifyDataSetChanged();
         DatabaseHelper helper = DatabaseHelper.getHelper(getApplicationContext());
         helper.delete(todoItem);
     }
@@ -130,6 +143,11 @@ public class MainActivity extends Activity implements EditTodoItemDialogFragment
     @Override
     public void onFinishEditDialog(String value, int itemPosition, DateTime dueDate, TodoItem.Priority priority) {
         updateItem(itemPosition, value, dueDate, priority);
+    }
+
+    @Override
+    public void onRemoveItem(int itemPosition) {
+        deleteItem(itemPosition);
     }
 
     private void updateItem(int position, String text, DateTime dueDate, TodoItem.Priority priority) {

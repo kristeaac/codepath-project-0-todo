@@ -1,7 +1,7 @@
 package com.codepath.simpletodo.data;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,28 +41,32 @@ public class TodoItemAdapter extends ArrayAdapter<TodoItem> {
         if (dueDateOptional.isPresent()) {
             DateTime dueDate = dueDateOptional.get();
             TextView dueDateText = (TextView) view.findViewById(R.id.todoItemDueDate);
-            dueDateText.setText(FORMATTER.print(dueDate));
+            dueDateText.setText(String.format("Due %s", FORMATTER.print(dueDate)));
         }
 
         Optional<TodoItem.Priority> priorityOptional = item.getPriority();
+        TextView priorityText = (TextView) view.findViewById(R.id.itemPriority);
+
         if (priorityOptional.isPresent()) {
             TodoItem.Priority priority = priorityOptional.get();
-            TextView priorityText = (TextView) view.findViewById(R.id.itemPriority);
-            int color = Color.WHITE;
+            int priorityBorder = R.drawable.right_border_high;
             switch (priority) {
                 case HIGH:
-                    color = Color.RED;
+                    priorityBorder = R.drawable.right_border_high;
                     break;
                 case MEDIUM:
-                    color = Color.YELLOW;
+                    priorityBorder = R.drawable.right_border_medium;
                     break;
-                default:
-                    color = Color.GREEN;
+                case LOW:
+                    priorityBorder = R.drawable.right_border_low;
                     break;
             }
-            priorityText.setTextColor(color);
             priorityText.setText(priority.name());
+            Drawable drawable = getContext().getResources().getDrawable(priorityBorder);
+            priorityText.setBackground(drawable);
 
+        } else {
+            priorityText.setText("");
         }
 
         return view;

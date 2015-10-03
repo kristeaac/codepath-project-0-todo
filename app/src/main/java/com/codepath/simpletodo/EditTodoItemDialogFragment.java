@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.codepath.simpletodo.data.TodoItem;
@@ -58,11 +58,19 @@ public class EditTodoItemDialogFragment extends DialogFragment {
             timePicker.setCurrentMinute(dueDate.getMinuteOfHour());
         }
 
-        Button saveButton = (Button) view.findViewById(R.id.saveEditButton);
+        TextView saveButton = (TextView) view.findViewById(R.id.saveEditButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onEditItem(fragmentView);
+            }
+        });
+
+        TextView removeButton = (TextView) view.findViewById(R.id.removeButton);
+        removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRemoveItem(fragmentView);
             }
         });
 
@@ -76,6 +84,12 @@ public class EditTodoItemDialogFragment extends DialogFragment {
             TodoItem.Priority priority = TodoItem.Priority.valueOf(priorityString);
             spinner.setSelection(priority.ordinal());
         }
+    }
+
+    public void onRemoveItem(View view) {
+        EditTodoItemDialogListener activity = (EditTodoItemDialogListener) getActivity();
+        activity.onRemoveItem(itemPosition);
+        this.dismiss();
     }
 
     public void onEditItem(View view) {
@@ -98,6 +112,7 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     public interface EditTodoItemDialogListener {
 
         void onFinishEditDialog(String value, int itemPosition, DateTime dueDate, TodoItem.Priority priority);
+        void onRemoveItem(int itemPosition);
 
     }
 

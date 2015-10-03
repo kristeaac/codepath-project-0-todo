@@ -37,7 +37,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+* The styling of the app could be improved. This process was a bit tedious. I would like to learn and apply best practices for designing a good Android app UI. 
 
 ## License
 

@@ -6,6 +6,7 @@ Submitted by: Kristy Caster
 
 Time spent: 6 hours spent in total
 
+## Related Work
 This project is the first in a series for [CodePath's Android Mobile Bootcamp for Engineers](http://codepath.com/androidbootcamp)
 
 * **Pre-work - SimpleTodo** - allows building a todo list with basic todo items management functionality including adding new items, editing and deleting an existing item
